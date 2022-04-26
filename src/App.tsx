@@ -7,9 +7,8 @@ import QuestionCard from './components/QuestionCard';
 
 //Types
 import { QuestionState } from './API';
-import { log } from 'console';
 
-type AnswerObject = {
+export type AnswerObject = {
   question: string;
   answer: string;
   correct: boolean;
@@ -18,7 +17,7 @@ type AnswerObject = {
 
 const TOTAL_QUESTIONS = 10;
 
-const App = () => {
+export const App = () => {
   const [loading, setLoading] = useState(false);
   const [questions, setQuestions] = useState<QuestionState[]>([]);
   const [number, setNumber] = useState(0);
@@ -39,9 +38,42 @@ const App = () => {
     setLoading(false);
   };
 
-  const checkAnswer = (e: React.MouseEvent<HTMLButtonElement>) => {};
+  const checkAnswer = (e: React.MouseEvent<HTMLButtonElement>) => {
+    if (!gameOver) {
+      //Get user answer
+      const answer = e.currentTarget.value;
 
-  const nextQuestion = () => {};
+      //Check answers against correct answer
+      const correct = questions[number].correct_answer === answer;
+
+      //If answer is correct
+      if (correct) {
+        setScore((prevScore) => {
+          return prevScore + 1;
+        });
+      }
+
+      //Save answer in the array for user answers
+      const answerObject = {
+        question: questions[number].question,
+        answer,
+        correct,
+        correctAnswer: questions[number].correct_answer,
+      };
+      setUserAnswers((prevState) => [...prevState, answerObject]);
+    }
+  };
+
+  const nextQuestion = () => {
+    //Moves to the next question if not the last question
+    const nextQuestion = number + 1;
+
+    if (nextQuestion === TOTAL_QUESTIONS) {
+      setGameOver(true);
+    } else {
+      setNumber(nextQuestion);
+    }
+  };
 
   return (
     <div className='App'>
